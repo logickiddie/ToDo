@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Cute To-Do List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+        
+        body {
+            font-family: 'Fredoka One', cursive;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 30px;
+            background: linear-gradient(135deg, #f5d7ff 0%, #a8edea 100%);
+            min-height: 100vh;
+            color: #333;
+            transition: background 0.5s ease;
+        }
+
+        .app-container {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        h1 {
+            color: #ff6b6b;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 3em;
+            position: relative;
+        }
+
+        h1::after {
+            content: ' ';
+            position: absolute;
+            width: 50px;
+            height: 5px;
+            background: #ff6b6b;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 5px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        #taskInput {
+            flex: 1;
+            padding: 20px 25px;
+            border: 3px solid #ffd700;
+            border-radius: 20px;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            background: #fff5e6;
+        }
+
+        #taskInput:focus {
+            border-color: #ff6b6b;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+            transform: scale(1.02);
+        }
+
+        button {
+            background: linear-gradient(135deg, #ffd700 0%, #ff6b6b 100%);
+            color: white;
+            border: none;
+            padding: 18px 28px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        button:hover {
+            transform: translateY(-3px) rotate(-2deg);
+            box-shadow: 0 8px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0) rotate(0);
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin: 35px 0;
+            justify-content: center;
+        }
+
+        .filters button {
+            background: #fff;
+            color: #ff6b6b;
+            border: 3px solid #ffd700;
+            padding: 15px 25px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .filters button.active {
+            background: linear-gradient(135deg, #ffd700 0%, #ff6b6b 100%);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .task-item {
+            background: #fff5e6;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .task-item:hover {
+            transform: translateX(15px);
+        }
+
+        .task-item:hover .delete-btn {
+            opacity: 1;
+            right: 10px;
+        }
+
+        .checkbox {
+            margin-right: 20px;
+            transform: scale(1.5);
+            transition: all 0.3s ease;
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 18px;
+            margin-right: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .completed {
+            text-decoration: line-through;
+            color: #888;
+            opacity: 0.7;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            font-size: 1.4em;
+            opacity: 0;
+            position: absolute;
+            right: -50px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .task-count {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff5e6;
+            border-radius: 15px;
+            color: #ff6b6b;
+            font-weight: bold;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .confetti {
+            position: fixed;
+            top: -10%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: #ffd700;
+            border-radius: 50%;
+            animation: confetti 2s linear infinite;
+        }
+
+        .theme-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            font-size: 1.5em;
+            color: #ff6b6b;
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.5em;
+            }
+            
+            #taskInput {
+                font-size: 16px;
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <i class="fas fa-palette theme-switcher" onclick="toggleTheme()"></i>
+        <h1>My Super Cute List</h1>
+        
+        <div class="input-group">
+            <input type="text" id="taskInput" placeholder="Add a new task... ✨">
+            <button onclick="addTask()"><i class="fas fa-plus"></i></button>
+        </div>
+
+        <div class="filters">
+            <button onclick="filterTasks('all')" class="active">All</button>
+            <button onclick="filterTasks('active')">Active</button>
+            <button onclick="filterTasks('completed')">Completed</button>
+        </div>
+
+        <div id="taskList"></div>
+        <div class="task-count" id="taskCount"></div>
+    </div>
+
+    <div class="confetti" id="confetti"></div>
+
+    <script>
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        let currentFilter = 'all';
+        let currentTheme = localStorage.getItem('theme') || 'default';
+        const themes = {
+            default: {
+                gradient: ['#ffd700', '#ff6b6b'],
+                accent: '#ff6b6b',
+                bg: '#fff5e6'
+            },
+            pastel: {
+                gradient: ['#a8edea', '#fed6e3'],
+                accent: '#ff9a8d',
+                bg: '#fff0f3'
+            },
+            dark: {
+                gradient: ['#4e4376', '#2b5876'],
+                accent: '#4a90e2',
+                bg: '#333'
+            }
+        };
+
+        function renderTasks() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            
+            const filteredTasks = tasks.filter(task => {
+                if (currentFilter === 'active') return !task.completed;
+                if (currentFilter === 'completed') return task.completed;
+                return true;
+            });
+
+            filteredTasks.forEach(task => {
+                const div = document.createElement('div');
+                div.className = 'task-item';
+                div.style.animation = 'popIn 0.3s ease';
+                
+                div.innerHTML = `
+                    <input type="checkbox" class="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})">
+                    <span class="task-text ${task.completed ? 'completed' : ''}">${task.text}</span>
+                    <button class="delete-btn" onclick="deleteTask(${task.id})"><i class="fas fa-trash-alt"></i></button>
+                `;
+                list.appendChild(div);
+            });
+
+            updateTaskCount();
+        }
+
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const text = input.value.trim();
+            if (text === '') return;
+
+            tasks.push({
+                id: Date.now(),
+                text: text,
+                completed: false
+            });
+
+            input.value = '';
+            saveAndRender();
+            animateInput();
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(task => task.id !== id);
+            saveAndRender();
+            createConfetti();
+        }
+
+        function toggleTask(id) {
+            tasks = tasks.map(task => 
+                task.id === id ? {...task, completed: !task.completed} : task
+            );
+            saveAndRender();
+            if(tasks.find(t => t.id === id).completed) createConfetti();
+        }
+
+        function filterTasks(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filters button').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('onclick') === `filterTasks('${filter}')`);
+            });
+            renderTasks();
+        }
+
+        function updateTaskCount() {
+            const count = tasks.filter(t => !t.completed).length;
+            document.getElementById('taskCount').textContent = 
+                count === 1 ? '1 task left 🌟' : `${count} tasks left 🌟`;
+        }
+
+        function saveAndRender() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            renderTasks();
+        }
+
+        function animateInput() {
+            const input = document.getElementById('taskInput');
+            input.style.transform = 'scale(1.05)';
+            setTimeout(() => input.style.transform = 'scale(1)', 200);
+        }
+
+        function createConfetti() {
+            const confettiContainer = document.getElementById('confetti');
+            for(let i = 0; i < 20; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti-piece';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                confetti.style.backgroundColor = themes[currentTheme].accent;
+                confettiContainer.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 2000);
+            }
+        }
+
+        function toggleTheme() {
+            const themesList = ['default', 'pastel', 'dark'];
+            const currentIndex = themesList.indexOf(currentTheme);
+            currentTheme = themesList[(currentIndex + 1) % themesList.length];
+            localStorage.setItem('theme', currentTheme);
+            applyTheme();
+        }
+
+        function applyTheme() {
+            const theme = themes[currentTheme];
+            document.body.style.background = `linear-gradient(135deg, ${theme.gradient[0]} 0%, ${theme.gradient[1]} 100%)`;
+            document.querySelectorAll('.task-item').forEach(item => item.style.background = theme.bg);
+            document.getElementById('taskInput').style.background = theme.bg;
+            document.querySelectorAll('.delete-btn').forEach(btn => btn.style.color = theme.accent);
+            document.querySelectorAll('.filters button').forEach(btn => {
+                btn.style.borderColor = theme.accent;
+                btn.style.color = theme.accent;
+            });
+            document.querySelectorAll('.filters button.active').forEach(btn => {
+                btn.style.background = `linear-gradient(135deg, ${theme.gradient[0]} 0%, ${theme.gradient[1]} 100%)`;
+            });
+        }
+
+        // Initial setup
+        applyTheme();
+        renderTasks();
+    </script>
+</body>
+</html>
